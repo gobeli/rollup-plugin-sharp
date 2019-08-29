@@ -1,4 +1,5 @@
 import { createFilter } from 'rollup-pluginutils';
+import sharp from 'sharp';
 
 const defaultInclude = ['**/*.svg', '**/*.png', '**/*.jpg', '**/*.gif'];
 
