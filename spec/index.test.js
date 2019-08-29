@@ -23,7 +23,7 @@ describe('simple tests', () => {
 });
 
 describe('fixture tests', () => {
-  // afterAll(() => rimraf('output/', () => undefined))
+  afterAll(() => rimraf('output/', () => undefined))
 
   test('should process png', async () => {
     // when
