@@ -3,7 +3,7 @@ import rimraf from 'rimraf';
 import fs from 'fs';
 import path from 'path';
 
-import rollupSharp from '../src';
+import rollupSharp from '../dist';
 
 process.chdir(__dirname);
 

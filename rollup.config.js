@@ -1,4 +1,4 @@
-import babel from 'rollup-plugin-babel';
+import typescript from 'rollup-plugin-typescript';
 
 const external = [
   'rollup-pluginutils',
@@ -11,13 +11,9 @@ const external = [
 ];
 
 export default {
-  input: 'src/index.js',
+  input: 'src/index.ts',
   external,
-  plugins: [
-    babel({
-      babelrc: true
-    })
-  ],
+  plugins: [typescript()],
   output: {
     format: 'cjs',
     file: 'dist/index.js'
