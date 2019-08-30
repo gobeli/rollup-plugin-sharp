@@ -1,6 +1,14 @@
 import babel from 'rollup-plugin-babel';
 
-const external = ['rollup-pluginutils', 'path', 'fs'];
+const external = [
+  'rollup-pluginutils',
+  'path',
+  'fs',
+  'mime-types',
+  'crypto',
+  'sharp',
+  'mkpath'
+];
 
 export default {
   input: 'src/index.js',

@@ -8,7 +8,12 @@ import mkpath from 'mkpath';
 const defaultInclude = ['**/*.svg', '**/*.png', '**/*.jpg', '**/*.gif'];
 
 export default function rollupSharp(options = {}) {
-  const { include = defaultInclude, exclude, publicPath = '', minifiedWidth = 20 } = options;
+  const {
+    include = defaultInclude,
+    exclude,
+    publicPath = '',
+    minifiedWidth = 20
+  } = options;
 
   const filter = createFilter(include, exclude);
   const copies = {};
@@ -22,12 +27,12 @@ export default function rollupSharp(options = {}) {
       const mimeType = lookup(id);
       const imageBuffer = fs.readFileSync(id);
 
-      const [ { file, info }, url ] = await Promise.all([
+      const [{ file, info }, { url, name }] = await Promise.all([
         resize(imageBuffer, minifiedWidth),
         createImageUrl(id, imageBuffer, publicPath)
       ]);
 
-      copies[id] = url;
+      copies[id] = name;
 
       return `
         export default {
@@ -39,75 +44,77 @@ export default function rollupSharp(options = {}) {
     },
 
     generateBundle: async function write(outputOptions) {
-      const base = options.destDir || outputOptions.dir || path.dirname(outputOptions.file)
+      const base =
+        options.destDir ||
+        outputOptions.dir ||
+        path.dirname(outputOptions.file);
 
-      await makePath(base)
+      await makePath(base);
 
-      return Promise.all(Object.keys(copies).map(async name => {
-        const output = copies[name]
-        const outputDirectory = path.join(base, path.dirname(output))
-        await makePath(outputDirectory);
-        const imageBuffer = fs.readFileSync(name);
-        return copy(imageBuffer, path.join(base, output))
-      }))
+      return Promise.all(
+        Object.keys(copies).map(async name => {
+          const output = copies[name];
+          const outputDirectory = path.join(base, path.dirname(output));
+          await makePath(outputDirectory);
+          const imageBuffer = fs.readFileSync(name);
+          return copy(imageBuffer, path.join(base, output));
+        })
+      );
     }
   };
 }
 
-
 /**
- * 
+ *
  * @param {string} image
- * @param {Buffer} imageBuffer 
- * @param {string} publicPath 
+ * @param {Buffer} imageBuffer
+ * @param {string} publicPath
  */
 async function createImageUrl(image, imageBuffer, publicPath) {
-  const hash = crypto.createHash("sha1")
+  const hash = crypto
+    .createHash('sha1')
     .update(imageBuffer)
-    .digest("hex")
+    .digest('hex')
     .substr(0, 16);
-    
+
   const ext = path.extname(image);
   const name = path.basename(image, ext);
   const fileName = `${name}.${hash}${ext}`;
-  return `${publicPath}${fileName}`;
+  return { url: `${publicPath}${fileName}`, name: fileName };
 }
 
 /**
- * 
+ *
  * Resize the given image
- * 
+ *
  * @param {Buffer} imageBuffer - base64
  * @returns {Object} resized file - base64
  */
 async function resize(imageBuffer, width) {
   const stream = sharp(imageBuffer);
 
-  const minifiedBuffer = await stream
-    .resize(width)
-    .toBuffer();
+  const minifiedBuffer = await stream.resize(width).toBuffer();
 
-  const info = await stream
-    .metadata();
+  const info = await stream.metadata();
 
   return {
     file: minifiedBuffer.toString('base64'),
     info
-  }
+  };
 }
 
 function copy(imageBuffer, dest) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(dest, imageBuffer, (err) => err ? reject(err) : resolve());
+    fs.writeFile(dest, imageBuffer, err => (err ? reject(err) : resolve()));
   });
 }
 
 /**
  * run mkpath for given path
- * @param {string} path 
+ * @param {string} path
  */
 async function makePath(path) {
   await new Promise((resolve, reject) => {
-    mkpath(path, (err) => err ? reject(err) : resolve());
+    mkpath(path, err => (err ? reject(err) : resolve()));
   });
 }
