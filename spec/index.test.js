@@ -32,7 +32,7 @@ describe('fixture tests', () => {
     // then
     const output = require('./output/output');
     expect(output.png.width).toBe(256);
-    assertExists(path.join('output', output.png.url));
+    assertExists(path.join('output', output.png.src));
   });
 });
 

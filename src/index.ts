@@ -46,8 +46,8 @@ export default function rollupSharp(options: SharpOptions = {}) {
 
       return `
         export default {
-            base64: 'data:${mimeType};base64,${file}',
-            url: '${url}',
+            placeholder: 'data:${mimeType};base64,${file}',
+            src: '${url}',
             width: ${info.width},
             height: ${info.height}
         }`;
