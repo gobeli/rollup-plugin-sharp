@@ -1,11 +1,13 @@
+const sharp = require('sharp');
+const mkpath = require('mkpath');
+
 import { readFileSync, writeFile } from 'fs';
 import { createFilter } from 'rollup-pluginutils';
 import { lookup } from 'mime-types';
 import { join, dirname, extname, basename } from 'path';
 import { createHash } from 'crypto';
-import sharp from 'sharp';
-import mkpath from 'mkpath';
-import { OutputOptions } from 'rollup';
+import { OutputOptions, Plugin, OutputBundle } from 'rollup';
+
 const defaultInclude = ['**/*.svg', '**/*.png', '**/*.jpg', '**/*.gif'];
 
 export interface SharpOptions {
@@ -14,14 +16,16 @@ export interface SharpOptions {
   publicPath?: string;
   destDir?: string;
   minifiedWidth?: number;
+  fileName?: string;
 }
 
-export default function rollupSharp(options: SharpOptions = {}) {
+export default function rollupSharp(options: SharpOptions = {}): Plugin {
   const {
     include = defaultInclude,
     exclude,
     publicPath = '',
-    minifiedWidth = 20
+    minifiedWidth = 20,
+    fileName = '[name].[hash][extname]'
   }: SharpOptions = options;
 
   const filter = createFilter(include, exclude);
@@ -39,7 +43,7 @@ export default function rollupSharp(options: SharpOptions = {}) {
 
       const [{ file, info }, { url, name }] = await Promise.all([
         resize(imageBuffer, minifiedWidth),
-        createImageUrl(id, imageBuffer, publicPath)
+        createImageUrl(id, imageBuffer, publicPath, fileName)
       ]);
 
       copies[id] = name;
@@ -53,7 +57,10 @@ export default function rollupSharp(options: SharpOptions = {}) {
         }`;
     },
 
-    generateBundle: async function write(outputOptions: OutputOptions) {
+    generateBundle: async function(
+      outputOptions: OutputOptions,
+      bundle: OutputBundle
+    ): Promise<void> {
       const base =
         options.destDir || outputOptions.dir || dirname(outputOptions.file);
 
@@ -67,7 +74,7 @@ export default function rollupSharp(options: SharpOptions = {}) {
           const imageBuffer = readFileSync(name);
           return copy(imageBuffer, join(base, output));
         })
-      );
+      ).then(() => undefined);
     }
   };
 }
@@ -75,7 +82,8 @@ export default function rollupSharp(options: SharpOptions = {}) {
 async function createImageUrl(
   image: string,
   imageBuffer: Buffer,
-  publicPath: string
+  publicPath: string,
+  fileName: string
 ): Promise<{ url: string; name: string }> {
   const hash = createHash('sha1')
     .update(imageBuffer)
@@ -84,8 +92,12 @@ async function createImageUrl(
 
   const ext = extname(image);
   const name = basename(image, ext);
-  const fileName = `${name}.${hash}${ext}`;
-  return { url: `${publicPath}${fileName}`, name: fileName };
+  const outputFileName = fileName
+    .replace(/\[hash\]/g, hash)
+    .replace(/\[extname\]/g, ext)
+    .replace(/\[name\]/g, name);
+
+  return { url: `${publicPath}${outputFileName}`, name: outputFileName };
 }
 
 async function resize(
