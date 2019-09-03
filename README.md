@@ -34,11 +34,11 @@ console.log(image.height); // width of the image in pixels, i.e 1024
 
 ## Options
 
-| Name          | Type                                    | Description                                                                      |
-| ------------- | --------------------------------------- | -------------------------------------------------------------------------------- |
-| include       | `string | RegExp | (string | RegExp)[]` | files to include                                                                 |
-| exclude       | `string | RegExp | (string | RegExp)[]` | files to exclude                                                                 |
-| publicPath    | `string`                                | public path for the `src` attribute                                              |
-| destDir       | `string`                                | destination of the processed image files                                         |
-| minifiedWidth | `string`                                | width of the minified placeholder image                                          |
-| fileName      | `string`                                | template for the exported file names, accepts `[name]`, `[hash]` and `[extname]` |
+| Name          | Type                                       | Description                                                                      |
+| ------------- | ------------------------------------------ | -------------------------------------------------------------------------------- |
+| include       | `string \| RegExp \| (string \| RegExp)[]` | files to include                                                                 |
+| exclude       | `string \| RegExp \| (string \| RegExp)[]` | files to exclude                                                                 |
+| publicPath    | `string`                                   | public path for the `src` attribute                                              |
+| destDir       | `string`                                   | destination of the processed image files                                         |
+| minifiedWidth | `string`                                   | width of the minified placeholder image                                          |
+| fileName      | `string`                                   | template for the exported file names, accepts `[name]`, `[hash]` and `[extname]` |
