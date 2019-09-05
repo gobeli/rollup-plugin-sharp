@@ -5,12 +5,12 @@ import { stat, readFile } from 'fs';
 import { join } from 'path';
 
 import rollupSharp, { SharpOptions } from '../src';
+import { promise } from '../src/helper';
 
 process.chdir(__dirname);
 
 const dest = 'output/output.js';
 const pngHash = 'f7636591ce3b1e0d';
-const svgHash = 'ff84eb7eb7196ae2';
 
 afterEach(done => rimraf('output/', done));
 
@@ -34,7 +34,6 @@ describe('fixture tests', () => {
 
     // then
     assertExists(join('output', `png.${pngHash}.png`));
-    assertExists(join('output', `svg.${svgHash}.svg`));
   });
 
   test('should include publicPath', async () => {
@@ -46,7 +45,6 @@ describe('fixture tests', () => {
 
     // then
     assertContains(`src: '/my-app/png.${pngHash}.png'`);
-    assertContains(`src: '/my-app/svg.${svgHash}.svg'`);
   });
 
   test('should respect fileName', async () => {
@@ -58,9 +56,7 @@ describe('fixture tests', () => {
 
     // then
     assertExists(join('output', `${pngHash}.png`));
-    assertExists(join('output', `${svgHash}.svg`));
     assertContains(`src: '${pngHash}.png`);
-    assertContains(`src: '${svgHash}.svg`);
   });
 });
 
@@ -86,10 +82,4 @@ function assertExists(name, shouldExist = true) {
   promise(stat, name)
     .then(() => true, () => false)
     .then(exists => expect(exists).toBe(shouldExist));
-}
-
-function promise(fn, ...args) {
-  return new Promise((resolve, reject) =>
-    fn(...args, (err, res) => (err ? reject(err) : resolve(res)))
-  );
 }

@@ -1,14 +1,13 @@
 {
   "name": "rollup-plugin-sharp",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "build": "rollup -c",
     "prebuild": "rimraf dist/*",
     "prepublish": "npm test",
-    "test": "jest",
-    "pretest": "npm run build"
+    "test": "jest"
   },
   "author": "",
   "license": "MIT",

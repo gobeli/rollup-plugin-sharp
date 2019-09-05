@@ -14,7 +14,7 @@ export default {
     plugins: [
         ...
         sharp({
-            include: ["**/*.jpg"], // defaults to .svg, .png, .jpg and .gif files
+            include: ["**/*.jpg"], // defaults to .png, .jpg and .gif files
             fileName: "[hash][extname]" // defaults to [name].[hash][extname]
         })
     ]
